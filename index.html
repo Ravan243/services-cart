@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .service-list {
+            margin-bottom: 20px;
+        }
+        .service {
+            margin-bottom: 10px;
+        }
+        .service label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .service input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .cart, .email-form {
+            margin-top: 20px;
+        }
+        #cart-list {
+            list-style: none;
+            padding: 0;
+        }
+        #cart-list li {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .cart-item-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .order-button, .submit-email-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .order-button:hover, .submit-email-button:hover {
+            background-color: #218838;
+        }
+        .email-form input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: calc(100% - 140px);
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Services Cart</h1>
+        
+        <div class="email-form" id="email-form">
+            <h2>Enter your email</h2>
+            <input type="email" id="user-email" placeholder="Your email" required>
+            <button class="submit-email-button" onclick="setEmail()">Submit</button>
+        </div>
+        
+        <div class="service-list">
+            <div class="service">
+                <input type="checkbox" id="service-1" data-name="Visualization" data-price="35">
+                <label for="service-1">Visualization - $35</label>
+            </div>
+            <div class="service">
+                <input type="checkbox" id="service-2" data-name="Planning" data-price="25">
+                <label for="service-2">Planning - $25</label>
+            </div>
+            <div class="service">
+                <input type="checkbox" id="service-3" data-name="Interior" data-price="40">
+                <label for="service-3">Interior - $40</label>
+            </div>
+        </div>
+        
+        <div class="cart" id="cart-container" style="display: none;">
+            <h2>Your Cart</h2>
+            <ul id="cart-list"></ul>
+            <button class="order-button" onclick="placeOrder()">Order</button>
+        </div>
+    </div>
+    
+    <script>
+        var userEmail = '';
+        
+        function setEmail() {
+            userEmail = document.getElementById('user-email').value;
+            if (!validateEmail(userEmail)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            document.getElementById('email-form').style.display = 'none';
+            document.getElementById('cart-container').style.display = 'block';
+        }
+        
+        function validateEmail(email) {
+            var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        function placeOrder() {
+            var cartItems = document.querySelectorAll('#cart-list li');
+            if (cartItems.length === 0) {
+                alert('Your cart is empty.');
+                return;
+            }
+            
+            var items = [];
+            cartItems.forEach(function(item) {
+                var name = item.querySelector('.item-name').textContent;
+                var price = item.querySelector('.item-price').textContent;
+                items.push(name + ' - ' + price);
+            });
+            
+            var mailtoLink = 'mailto:sdovasadov@gmail.com?subject=Order%20Request&body=' +
+                encodeURIComponent('Customer Email: ' + userEmail + '\n\nOrder details:\n\n' + items.join('\n') + '\n\nThank you!');
+            
+            window.location.href = mailtoLink;
+        }
+        
+        document.querySelectorAll('.service input[type="checkbox"]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                var cartList = document.getElementById('cart-list');
+                if (this.checked) {
+                    var li = document.createElement('li');
+                    var name = this.getAttribute('data-name');
+                    var price = this.getAttribute('data-price');
+                    
+                    li.innerHTML = '<span class="item-name">' + name + '</span> - <span class="item-price">$' + price + '</span>';
+                    cartList.appendChild(li);
+                } else {
+                    var items = cartList.querySelectorAll('li');
+                    items.forEach(function(item) {
+                        if (item.querySelector('.item-name').textContent === this.getAttribute('data-name')) {
+                            cartList.removeChild(item);
+                        }
+                    }.bind(this));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
